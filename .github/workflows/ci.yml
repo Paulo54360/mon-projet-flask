@@ -34,8 +34,17 @@ jobs:
       - name: Installer les dependances
         run: pip install -r requirements.txt
 
+      - name: Pre-commit hooks
+        run: pre-commit run --all-files
+
       - name: Linting
         run: flake8 src/ tests/ --max-line-length=120
+
+      - name: Build (verification Python)
+        run: python -m compileall src
+
+      - name: Build Docker image
+        run: docker build -t mon-projet-flask:ci .
 
       - name: Tests avec couverture
         run: |
