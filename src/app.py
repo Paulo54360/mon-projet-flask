@@ -29,5 +29,10 @@ def add(a, b):
     return jsonify({"result": first + second})
 
 
+@app.route("/about")
+def about():
+    return jsonify({"app": "Mon projet Flask", "version": "1.0"})
+
+
 if __name__ == "__main__":
     app.run(debug=True)
