@@ -34,13 +34,23 @@ def test_not_found(client):
     assert response.status_code == 404
 
 
-def test_add(client):
-    response = client.get("/add/3/5")
+@pytest.mark.parametrize(
+    ("a", "b", "expected"),
+    [
+        (3, 5, 8),
+        (-1, 1, 0),
+        (0, 0, 0),
+    ],
+)
+def test_add_parametrize(client, a, b, expected):
+    response = client.get(f"/add/{a}/{b}")
     assert response.status_code == 200
-    assert response.get_json()["result"] == 8
+    assert response.get_json()["result"] == expected
 
 
-def test_add_negative(client):
-    response = client.get("/add/-1/1")
+def test_about(client):
+    response = client.get("/about")
     assert response.status_code == 200
-    assert response.get_json()["result"] == 0
+    data = response.get_json()
+    assert data["app"] == "Mon projet Flask"
+    assert data["version"] == "1.0"
