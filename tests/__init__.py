@@ -1,1 +1,1 @@
-# Package marker for tests.
+__all__ = []

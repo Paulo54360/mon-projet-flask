@@ -25,12 +25,8 @@ def add(a, b):
         second = int(b)
     except ValueError:
         return jsonify({"error": "Les parametres doivent etre des entiers"}), 400
+
     return jsonify({"result": first + second})
-
-
-@app.route("/about")
-def about():
-    return jsonify({"app": "Mon projet Flask", "version": "1.0"})
 
 
 if __name__ == "__main__":
