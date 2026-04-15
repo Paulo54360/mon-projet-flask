@@ -9,3 +9,4 @@ test-results/
 .vscode/
 .idea/
 .DS_Store
+audit-report.json

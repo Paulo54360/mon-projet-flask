@@ -38,7 +38,7 @@ Les hooks verifies ici :
 - qualite des fichiers YAML
 - suppression des espaces/trailing whitespace
 - fin de fichier correcte
-- linting `flake8`
+- linting `ruff`
 
 ## Docker (build local)
 
@@ -57,44 +57,54 @@ docker run --rm -p 5000:5000 mon-projet-flask:local
 ## Qualite et tests
 
 ```bash
-flake8 src/ tests/ --max-line-length=120
+black --check src/ tests/
+ruff check src/ tests/
 pytest --cov=src --cov-report=term --cov-report=html:coverage-report -v
 ```
 
 Le rapport de couverture HTML est genere dans `coverage-report/`.
+
+## Securite
+
+Ce projet integre les verifications de securite suivantes :
+- **GitLeaks** : detection de secrets dans le code et l'historique Git
+- **pip-audit** : scan des CVE dans les dependances Python
+- **Bandit** : analyse de securite du code Python
+- **Semgrep** : detection de patterns dangereux
+- **Dependabot** : mises a jour automatiques des dependances et actions GitHub
 
 ## Pipeline CI (GitHub Actions)
 
 Workflow : `.github/workflows/ci.yml`
 
 Le pipeline execute automatiquement sur `push` et `pull_request` vers `main` :
-- pre-commit hooks
-- linting (`flake8`)
-- build de verification (`python -m compileall src`)
-- build Docker (`docker build`)
-- tests (`pytest`)
-- couverture (`pytest-cov`)
+- detection de secrets (GitLeaks)
+- verification formatage (`black`)
+- linting (`ruff`)
+- scan dependances (`pip-audit`)
+- securite applicative (`bandit` + `semgrep`)
+- tests (`pytest`) + couverture (`pytest-cov`, seuil 70%)
 - upload de l'artefact `coverage-report`
-- publication des resultats de tests sur PR via l'action Marketplace `EnricoMi/publish-unit-test-result-action@v2`
+- scan SonarCloud
 
 ## Notions du cours couvertes dans ce TP
 
 Ce projet applique les notions presentes dans le cours "Integration Continue Course.pdf" :
 
 - **CI (integration frequente)** : verification automatique a chaque `push` et `pull_request` sur `main`.
-- **Pipeline par etapes** : checkout -> install -> lint -> build -> test -> report.
-- **Fail fast** : le lint est execute avant les tests pour echouer rapidement en cas de probleme de qualite.
+- **Pipeline par etapes** : checkout -> scans securite -> qualite -> tests -> report.
+- **Fail fast** : GitLeaks et les verifications qualite/sécurité echouent avant les tests lourds.
 - **Runner GitHub-hosted** : execution sur `ubuntu-latest`.
-- **Actions reutilisables (Marketplace)** : `actions/checkout`, `actions/setup-python`, `actions/cache`, `actions/upload-artifact`, `EnricoMi/publish-unit-test-result-action`.
+- **Actions reutilisables (Marketplace)** : `actions/checkout`, `actions/setup-python`, `actions/cache`, `actions/upload-artifact`, `gitleaks/gitleaks-action`, `SonarSource/sonarqube-scan-action`.
 - **Versionning des actions** : actions epinglees avec version (`@v4`, `@v5`, `@v2`) comme recommande.
 - **Pre-hook qualite** : hooks `pre-commit` executes localement avant commit et verifies aussi dans la CI.
 - **Tests automatises avec pytest** : tests de routes Flask, fixture `client`, assertions explicites.
 - **Parametrization pytest** : test `@pytest.mark.parametrize` sur la route `/add`.
-- **Build Docker** : image construite en CI pour valider la phase build du pipeline.
 - **Couverture de code** : `pytest-cov` + rapport terminal et HTML.
 - **Artefacts** : publication du dossier `coverage-report` dans GitHub Actions.
 - **Cache des dependances** : cache pip base sur le hash de `requirements.txt`.
-- **Qualite de code** : linting `flake8` dans le pipeline.
+- **Qualite de code** : linting `ruff` et formatage `black` dans le pipeline.
+- **Securite CI/CD** : scans GitLeaks, pip-audit, Bandit, Semgrep et suivi SonarCloud.
 - **Badge CI** : indicateur d'etat du pipeline en tete du README.
 - **Protection de branche (processus GitHub)** : merge via PR avec checks CI requis.
 

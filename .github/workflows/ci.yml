@@ -18,6 +18,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detection de secrets (GitLeaks)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Installer Python
         uses: actions/setup-python@v5
@@ -35,11 +42,24 @@ jobs:
       - name: Installer les dependances
         run: pip install -r requirements.txt
 
+      - name: Verifier injection du secret
+        env:
+          API_KEY: ${{ secrets.API_KEY }}
+        run: |
+          if [ -z "$API_KEY" ]; then
+            echo "ERREUR: API_KEY non definie"
+            exit 1
+          fi
+          echo "API_KEY est bien injectee (valeur masquee)"
+
       - name: Verifier formatage (black)
         run: black --check src/ tests/
 
       - name: Linting avec ruff
         run: ruff check src/ tests/
+
+      - name: Scan dependances (pip-audit)
+        run: pip-audit -r requirements.txt
 
       - name: Analyse securite Bandit
         run: bandit -r src/ -ll

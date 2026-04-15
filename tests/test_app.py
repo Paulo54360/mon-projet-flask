@@ -73,3 +73,11 @@ def test_add_with_explicit_plus_sign(client):
     response = client.get("/add/+4/6")
     assert response.status_code == 200
     assert response.get_json()["result"] == 10
+
+
+def test_security_headers_are_present(client):
+    response = client.get("/")
+    assert response.status_code == 200
+    assert response.headers["X-Content-Type-Options"] == "nosniff"
+    assert response.headers["X-Frame-Options"] == "SAMEORIGIN"
+    assert response.headers["Content-Security-Policy"] == "default-src 'self'"
