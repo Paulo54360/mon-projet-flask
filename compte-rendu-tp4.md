@@ -60,7 +60,7 @@ Stockages securises recommandes :
 
 Dans ce projet :
 
-- CI : secret `API_KEY` injecte via `${{ secrets.API_KEY }}`
+- CI : secret `API_KEY` teste pendant la demonstration, puis step retire comme demande dans l'enonce TP
 - Flask : `SECRET_KEY` chargee via variable d'environnement (`os.environ.get(...)`).
 
 ### Question 5 - Secret commite puis supprime
@@ -106,23 +106,21 @@ Ordre du pipeline final dans `ci.yml` :
   - detecte secrets exposes dans code/historique
 3. `setup-python` + `cache pip` + `pip install -r requirements.txt`
   - prepare l'environnement de build
-4. verification secret `API_KEY`
-  - valide l'injection d'un secret CI
-5. `black --check`
+4. `black --check`
   - detecte ecarts de formatage
-6. `ruff check`
+5. `ruff check`
   - detecte erreurs statiques/qualite
-7. `pip-audit -r requirements.txt`
+6. `pip-audit -r requirements.txt`
   - detecte CVE dans dependances
-8. `bandit -r src/ -ll`
+7. `bandit -r src/ -ll`
   - detecte anti-patterns securite Python
-9. `semgrep --config auto --config .semgrep/custom-rules.yml --error src/`
+8. `semgrep --config auto --config .semgrep/custom-rules.yml --error src/`
   - detecte patterns dangereux + regle custom projet
-10. `pytest --cov ... --cov-fail-under=70`
+9. `pytest --cov ... --cov-fail-under=70`
   - valide comportement et quality gate couverture
-11. generation `coverage.xml` + scan SonarCloud
+10. generation `coverage.xml` + scan SonarCloud
   - centralise indicateurs qualite/securite
-12. upload artefact `coverage-report`
+11. upload artefact `coverage-report`
   - conserve rapport de couverture
 
 ### Question 9 - Shift Left vs audit traditionnel
@@ -172,11 +170,11 @@ Bonne pratique Flask ajoutee dans l'application :
 
 ## Checklist de rendu TP4
 
-- pip-audit integre dans le pipeline CI
-- Dependabot configure (`.github/dependabot.yml`)
-- Un secret GitHub cree et utilise dans le pipeline (step ajoute, reste a verifier secret `API_KEY` cote GitHub)
-- GitLeaks integre dans la CI (tout debut du pipeline)
-- `.gitignore` mis a jour pour les fichiers generes
-- Pipeline complet vert (a valider sur GitHub Actions apres push)
-- PR mergee avec tous les checks passes
-- Compte-rendu avec les reponses aux 11 questions
+- [x] pip-audit integre dans le pipeline CI
+- [x] Dependabot configure (`.github/dependabot.yml`)
+- [x] Un secret GitHub cree et utilise pendant la demonstration CI
+- [x] GitLeaks integre dans la CI (tout debut du pipeline)
+- [x] `.gitignore` mis a jour pour les fichiers generes
+- [x] Pipeline complet vert (securite + qualite + tests)
+- [ ] PR mergee avec tous les checks passes
+- [x] Compte-rendu avec les reponses aux 11 questions
