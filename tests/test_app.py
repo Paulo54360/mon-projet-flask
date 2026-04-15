@@ -54,3 +54,22 @@ def test_about(client):
     data = response.get_json()
     assert data["app"] == "Mon projet Flask"
     assert data["version"] == "1.0"
+
+
+def test_add_invalid_input_returns_400(client):
+    response = client.get("/add/abc/1")
+    assert response.status_code == 400
+    data = response.get_json()
+    assert "entiers" in data["error"]
+
+
+def test_add_large_values(client):
+    response = client.get("/add/1000000/999999")
+    assert response.status_code == 200
+    assert response.get_json()["result"] == 1999999
+
+
+def test_add_with_explicit_plus_sign(client):
+    response = client.get("/add/+4/6")
+    assert response.status_code == 200
+    assert response.get_json()["result"] == 10
