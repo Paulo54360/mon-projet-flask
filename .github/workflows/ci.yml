@@ -39,8 +39,8 @@ jobs:
       - name: Pre-commit hooks
         run: pre-commit run --all-files
 
-      - name: Linting
-        run: flake8 src/ tests/ --max-line-length=120
+      - name: Linting avec Ruff
+        run: ruff check src/ tests/
 
       - name: Build (verification Python)
         run: python -m compileall src
