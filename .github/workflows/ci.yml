@@ -42,6 +42,12 @@ jobs:
       - name: Linting avec Ruff
         run: ruff check src/ tests/
 
+      - name: Analyse sécurité Bandit
+        run: bandit -r src/ -ll
+
+      - name: Analyse sécurité Semgrep
+        run: semgrep --config auto --error src/
+
       - name: Build (verification Python)
         run: python -m compileall src
 
