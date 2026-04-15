@@ -45,7 +45,7 @@ jobs:
         run: bandit -r src/ -ll
 
       - name: Analyse securite Semgrep
-        run: semgrep --config auto --error src/
+        run: semgrep --config auto --config .semgrep/custom-rules.yml --error src/
 
       - name: Tests avec couverture
         run: |

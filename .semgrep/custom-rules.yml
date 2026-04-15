@@ -1,0 +1,10 @@
+rules:
+  - id: flask-no-print-in-production
+    message: "N'utilisez pas print() dans le code Flask de production. Utilisez un logger."
+    severity: ERROR
+    languages:
+      - python
+    paths:
+      include:
+        - "**/src/**/*.py"
+    pattern: print(...)

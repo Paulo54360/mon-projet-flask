@@ -11,4 +11,6 @@ select = [
 "I", # tri des imports (isort)
 "B", # bugbear (bugs courants)
 "UP", # pyupgrade (modernisation)
+"C4", # comprehensions plus idiomatiques
+"SIM", # simplifications de code
 ]
