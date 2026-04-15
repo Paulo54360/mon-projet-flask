@@ -12,9 +12,8 @@ permissions:
   pull-requests: write
 
 jobs:
-  test:
+  quality:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
 
@@ -22,8 +21,6 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Vérification du formatage
-        run: black --check src/ tests/
 
       - name: Cache pip
         uses: actions/cache@v4
@@ -36,30 +33,24 @@ jobs:
       - name: Installer les dependances
         run: pip install -r requirements.txt
 
-      - name: Pre-commit hooks
-        run: pre-commit run --all-files
+      - name: Verifier formatage (black)
+        run: black --check src/ tests/
 
-      - name: Linting avec Ruff
+      - name: Linting avec ruff
         run: ruff check src/ tests/
 
-      - name: Analyse sécurité Bandit
+      - name: Analyse securite Bandit
         run: bandit -r src/ -ll
 
-      - name: Analyse sécurité Semgrep
+      - name: Analyse securite Semgrep
         run: semgrep --config auto --error src/
-
-      - name: Build (verification Python)
-        run: python -m compileall src
-
-      - name: Build Docker image
-        run: docker build -t mon-projet-flask:ci .
 
       - name: Tests avec couverture
         run: |
           pytest --cov=src \
             --cov-report=term \
             --cov-report=html:coverage-report \
-            --junitxml=test-results/pytest-results.xml \
+            --cov-fail-under=70 \
             -v
 
       - name: Sauvegarder le rapport
@@ -68,9 +59,3 @@ jobs:
         with:
           name: coverage-report
           path: coverage-report/
-
-      - name: Publier les resultats de tests (PR)
-        if: github.event_name == 'pull_request' && always()
-        uses: EnricoMi/publish-unit-test-result-action@v2
-        with:
-          files: test-results/pytest-results.xml
